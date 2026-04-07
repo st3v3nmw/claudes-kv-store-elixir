@@ -5,6 +5,7 @@ defmodule Server.Application do
   def start(_type, _args) do
     children = [
       Server.KVStore,
+      Server.Raft,
       {Bandit, plug: Server.Router, port: 8080}
     ]
 

@@ -28,7 +28,8 @@ defmodule Server.MixProject do
     [
       {:bandit, "~> 1.6"},
       {:plug, "~> 1.16"},
-      {:jason, "~> 1.4"}
+      {:jason, "~> 1.4"},
+      {:req, "~> 0.5"}
     ]
   end
 end
