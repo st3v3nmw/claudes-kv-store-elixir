@@ -1,2 +1,2 @@
 challenge: kv-store
-stage: http-api
+stage: leader-election

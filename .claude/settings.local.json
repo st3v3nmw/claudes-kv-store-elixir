@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(clstr --help)",
+      "Bash(clstr next:*)",
+      "Bash(clstr status:*)",
+      "Bash(clstr test:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "WebFetch(domain:clstr.io)"
+    ]
+  }
+}
