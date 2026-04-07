@@ -63,7 +63,15 @@ defmodule Server.Raft do
       voted_for: voted_for
     }
 
-    {:ok, reset_election_timer(state)}
+    # In single-node mode there are no peers to wait for — elect self immediately.
+    state =
+      if peers == [] do
+        start_election(state)
+      else
+        reset_election_timer(state)
+      end
+
+    {:ok, state}
   end
 
   # ── handle_info ───────────────────────────────────────────────────────────
