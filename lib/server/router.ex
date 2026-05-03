@@ -100,7 +100,7 @@ defmodule Server.Router do
         end)
 
       _ ->
-        send_resp(conn, 405, "method not allowed")
+        conn |> put_resp_content_type("text/plain") |> send_resp(405, "method not allowed")
     end
   end
 
@@ -108,8 +108,11 @@ defmodule Server.Router do
 
   match "/kv" do
     case conn.method do
-      m when m in ["GET", "PUT", "DELETE"] -> send_resp(conn, 400, "key cannot be empty")
-      _ -> send_resp(conn, 405, "method not allowed")
+      m when m in ["GET", "PUT", "DELETE"] ->
+        conn |> put_resp_content_type("text/plain") |> send_resp(400, "key cannot be empty")
+
+      _ ->
+        send_resp(conn, 405, "method not allowed")
     end
   end
 
@@ -118,15 +121,19 @@ defmodule Server.Router do
 
     if key == "" do
       case conn.method do
-        m when m in ["GET", "PUT", "DELETE"] -> send_resp(conn, 400, "key cannot be empty")
-        _ -> send_resp(conn, 405, "method not allowed")
+        m when m in ["GET", "PUT", "DELETE"] ->
+          conn |> put_resp_content_type("text/plain") |> send_resp(400, "key cannot be empty")
+
+        _ ->
+          send_resp(conn, 405, "method not allowed")
       end
     else
       case conn.method do
         "PUT" -> with_leader(conn, &handle_put(&1, key))
         "GET" -> with_leader(conn, &handle_get(&1, key))
         "DELETE" -> with_leader(conn, &handle_delete(&1, key))
-        _ -> send_resp(conn, 405, "method not allowed")
+        _ ->
+          conn |> put_resp_content_type("text/plain") |> send_resp(405, "method not allowed")
       end
     end
   end
@@ -163,22 +170,37 @@ defmodule Server.Router do
     {:ok, body, conn} = Plug.Conn.read_body(conn)
 
     if body == "" do
-      send_resp(conn, 400, "value cannot be empty")
+      conn
+      |> put_resp_content_type("text/plain")
+      |> send_resp(400, "value cannot be empty")
     else
       Server.KVStore.put(key, body)
-      send_resp(conn, 200, "")
+
+      conn
+      |> put_resp_content_type("text/plain")
+      |> send_resp(200, "")
     end
   end
 
   defp handle_get(conn, key) do
     case Server.KVStore.get(key) do
-      {:ok, value} -> send_resp(conn, 200, value)
-      :error -> send_resp(conn, 404, "key not found")
+      {:ok, value} ->
+        conn
+        |> put_resp_content_type("text/plain")
+        |> send_resp(200, value)
+
+      :error ->
+        conn
+        |> put_resp_content_type("text/plain")
+        |> send_resp(404, "key not found")
     end
   end
 
   defp handle_delete(conn, key) do
     Server.KVStore.delete(key)
-    send_resp(conn, 200, "")
+
+    conn
+    |> put_resp_content_type("text/plain")
+    |> send_resp(200, "")
   end
 end
